@@ -1,0 +1,11 @@
+**/*.po
+**/__pycache__
+**/lost+found
+*.md
+*.svg
+*.txt
+.*
+Dockerfile*
+Makefile
+requirements/*.in
+tests
