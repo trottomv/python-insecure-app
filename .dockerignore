@@ -1,0 +1,12 @@
+.*
+*.md
+*.svg
+*.txt
+**/__pycache__
+**/*.po
+**/lost+found
+Dockerfile*
+LICENSE
+Makefile
+requirements/*.in
+tests
