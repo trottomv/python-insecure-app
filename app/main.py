@@ -2,7 +2,6 @@ import requests
 from app import config
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from jinja2 import Template
 
 app = FastAPI(
     title="Try Hack Me",
@@ -15,7 +14,7 @@ app = FastAPI(
 @app.get("/", response_class=HTMLResponse)
 def try_hack_me(name: str = None):
     query = name or config.SUPER_SECRET_NAME
-    public_ip = requests.get(config.PUBLIC_IP_SERVICE_URL).text
+    public_ip = requests.get(config.PUBLIC_IP_SERVICE_URL, timeout=1).text
     content = f"<h1>Hello, {query}!<h1><p>Public IP: {public_ip}</p>"
     # NOTE: https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response
-    return Template(content).render()
+    return HTMLResponse(content)
