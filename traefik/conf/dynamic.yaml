@@ -1,0 +1,33 @@
+http:
+  routers:
+    app:
+      rule: Host(`localhost`) && PathPrefix(`/`)
+      service: app
+      entryPoints:
+        - web
+        - websecure
+      middlewares:
+        - secureHeaders
+        - waf
+  services:
+    app:
+      loadBalancer:
+        servers:
+          - url: http://app:1337/
+  middlewares:
+    secureHeaders:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+    waf:
+      plugin:  # https://traefik.io/blog/traefik-3-deep-dive-into-wasm-support-with-coraza-waf-plugin
+        coraza:  # https://coraza.io/
+          directives:
+            - SecRuleEngine Off
+            # - SecRequestBodyAccess On
+            # - SecRequestBodyLimitAction ProcessPartial
+            - SecDebugLogLevel 9
+            - SecRule REQUEST_URI|ARGS "@rx \{\{.*\}\}" "id:1001,phase:2,deny,status:403,log,msg:'Blocked SSTI attempt'"
+            - SecRule REQUEST_URI|ARGS "@rx (?i)(\bOR\b|\bAND\b|\bSELECT\b|\bUNION\b|\bDROP\b).*(=|LIKE)" "id:1002,phase:2,deny,status:403,log,msg:'SQL Injection attempt detected'"
+            - SecRule REQUEST_URI|ARGS "@rx (?i)<\s*script.*?>" "id:1003,phase:2,deny,status:403,log,msg:'XSS Injection detected'"
+            - SecRule REQUEST_URI|ARGS "@rx (\.\./|\./)" "id:1004,phase:2,deny,status:403,log,msg:'Directory traversal attempt detected'"
