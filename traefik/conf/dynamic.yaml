@@ -1,0 +1,42 @@
+http:
+  routers:
+    app:
+      rule: Host(`localhost`) && PathPrefix(`/`)
+      service: app
+      middlewares:
+        - secureHeaders
+        - waf
+  services:
+    app:
+      loadBalancer:
+        servers:
+          - url: http://app:8000/
+  middlewares:
+    secureHeaders:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+    waf:
+      plugin:
+        coraza:
+          directives:
+            - SecRuleEngine On
+            - SecDebugLogLevel 3
+            - SecRule REQUEST_URI "@rx \{\{.*\}\}" "id:1001,phase:2,deny,status:403,log,msg:'Blocked SSTI attempt'"
+            - SecRule REQUEST_URI "@detectSQLi" "id:1002,phase:2,deny,status:403,log,msg:'SQL Injection attempt detected'"
+            - SecRule REQUEST_BODY "@detectXSS" "id:1003,phase:2,deny,status:403,log,msg:'XSS Injection attempt detected'"
+            - SecRule REQUEST_URI "@rx \.\./" "id:1004,phase:2,deny,status:403,log,msg:'Directory traversal attempt detected'"
+            - SecRule ARGS|ARGS_NAMES|REQUEST_HEADERS|REQUEST_COOKIES|REQUEST_URI "@rx \b(select|insert|union|drop|update|delete|--|\b(=|')\s*([\w\W]*?))\b" "id:10002,phase:2,deny,status:403,log,msg:'SQL Injection attempt detected', chain"
+            - SecRule MATCHED_VAR "@rx ^[^?]*$" "t:none"
+            # - SecRule ARGS|ARGS_NAMES|REQUEST_HEADERS|REQUEST_COOKIES|REQUEST_URI "@rx <(script|img|iframe|object|embed|form|input)" "id:1003,phase:2,deny,status:403,log,msg:'XSS attack detected'"
+            # - SecRule ARGS|ARGS_NAMES|REQUEST_URI "@rx (\.\./|\.\.\\|%2e%2e%2f)" "id:1004,phase:2,deny,status:403,log,msg:'Potential LFI/RFI attempt detected'"
+            # - SecRule ARGS|ARGS_NAMES|REQUEST_BODY "@rx (eval|exec|system|shell_exec|passthru|proc_open|popen|pcntl_exec)" "id:1006,phase:2,deny,status:403,log,msg:'Potential RCE attempt detected'"
+            # - SecRule REQUEST_HEADERS|REQUEST_URI|ARGS "@rx \r|\n|\x0d|\x0a" "id:1007,phase:1,deny,status:400,log,msg:'Detected HTTP response splitting or header injection attempt'"
+            # - SecRule REQUEST_HEADERS:Referer "@rx https://(www\.)?yourdomain\.com" "id:1008,phase:1,deny,status:403,log,msg:'CSRF attempt detected'"
+            # - SecRule REQUEST_HEADERS:User-Agent "@rx bot|crawl|slurp|spider" "id:1009,phase:1,deny,status:429,log,msg:'Rate limit exceeded'"
+            # - SecRule ARGS|ARGS_NAMES|REQUEST_BODY "@rx (\b(?:base64|eval|gzinflate|exec)\b|\%3c|\%2f)" "id:1010,phase:2,deny,status:403,log,msg:'Suspicious character sequence detected'"
+
+tls:
+  certificates:
+    - certFile: /traefik/localhost/cert.pem
+      keyFile: /traefik/localhost/key.pem

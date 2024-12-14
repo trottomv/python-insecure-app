@@ -1,0 +1,28 @@
+api:
+  insecure: true
+  dashboard: true
+  debug: true
+
+entryPoints:
+  web:
+    address: ":8000"
+  websecure:
+    address: ":8443"
+    http:
+      tls:
+        options:
+
+log:
+  level: INFO
+
+ping: true
+
+providers:
+  file:
+    filename: /traefik/conf/dynamic.yaml
+
+experimental:
+  plugins:
+    coraza:
+      moduleName: "github.com/jcchavezs/coraza-http-wasm-traefik"
+      version: "v0.3.0"
