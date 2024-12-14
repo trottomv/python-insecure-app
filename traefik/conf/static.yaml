@@ -1,0 +1,38 @@
+accessLog: {}
+
+api:
+  insecure: false
+  dashboard: false
+  debug: false
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      storage: /letsencrypt/acme.json
+      tlsChallenge: true
+      httpChallenge:
+        entryPoint: web
+
+entryPoints:
+  web:
+    address: ":1337"
+  websecure:
+    address: ":8443"
+    http:
+      tls:
+        options:
+
+log:
+  level: INFO
+
+ping: true
+
+providers:
+  file:
+    filename: /traefik/conf/dynamic.yaml
+
+experimental:
+  plugins:
+    coraza:
+      moduleName: "github.com/jcchavezs/coraza-http-wasm-traefik"
+      version: "v0.3.0"
