@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.12-slim-bookworm@sha256:31a416db24bd8ade7dac5fd5999ba6c234d7fa79d4add8781e95f41b187f4c9a AS debian
+FROM python:3.12-alpine@sha256:9c51ecce261773a684c8345b2d4673700055c513b4d54bc0719337d3e4ee552e AS alpine
 
-LABEL project="Python Insecure App" service="FastAPI" stage="debian"
+LABEL project="Python Insecure App" service="FastAPI" stage="alpine"
 ENV APPUSER=nonroot \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -14,7 +14,13 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 WORKDIR $WORKDIR
 COPY --chown=$APPUSER ./requirements/base.txt requirements/base.txt
 COPY --chown=$APPUSER ./requirements/common.txt requirements/common.txt
-RUN useradd --no-create-home $APPUSER \
+RUN addgroup -S $APPUSER \
+    && adduser -S $APPUSER -G $APPUSER \
+    # && apk update \
+    # && apk upgrade \
+    #     libcrypto3 \
+    #     libssl3 \
+    # && rm -rf /var/cache/apk \
     && chown $APPUSER:$APPUSER $WORKDIR \
     && python3 -m venv $VIRTUAL_ENV \
     && chown -R $APPUSER:$APPUSER $VIRTUAL_ENV \

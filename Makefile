@@ -7,7 +7,19 @@ audit:  ## Audit dependencies and common security issues
 
 .PHONY: build
 build:  ## Build docker image
-	docker build --pull -t python-insecure-app .
+	docker build --pull --tag python-insecure-app .
+
+.PHONY: build_alpine
+build_alpine:  ## Build docker alpine image
+	docker build --file Dockerfile.alpine --pull --tag python-insecure-app:alpine .
+
+.PHONY: build_wolfi
+build_wolfi:  ## Build docker wolfi image
+	docker build --file Dockerfile.wolfi --pull --target wolfi-distroless --tag python-insecure-app:wolfi .
+
+.PHONY: build_distroless
+build_distroless:  ## Build docker distroless image
+	docker build --file Dockerfile.distroless --pull --tag python-insecure-app:distroless .
 
 .PHONY: check
 check:  ## Check linting and vulnerabilities
@@ -25,7 +37,7 @@ fuzzytest: install_dev  ## Run fuzzy tests
 
 .PHONY: install_base
 install_base:  ## Install base requirements and dependencies
-	python3 -m pip install --quiet --upgrade pip~=24.3.0 uv~=0.4.0
+	python3 -m pip install --quiet --upgrade pip~=25.1.0 uv~=0.7.0
 
 .PHONY: install_common
 install_common: requirements install_base  ## Install common requirements and dependencies
@@ -42,7 +54,7 @@ outdated:  ## Check outdated requirements and dependencies
 .PHONY: pentest
 pentest:  ## Run pentest
 	docker run --rm -t \
-		--volume $$PWD/.zap/reports:/zap/wrk/reports:rw \
+		--volume ${PWD}/.zap/reports:/zap/wrk/reports:rw \
 		ghcr.io/zaproxy/zaproxy:stable \
 		zap-api-scan.py \
 		-t http://host.docker.internal:8000/openapi.json \
@@ -69,13 +81,22 @@ requirements: install_base  ## Compile requirements
 	python3 -m uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/common.txt requirements/common.in
 	python3 -m uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/dev.txt requirements/dev.in
 
-.PHONY: rundev
-rundev: install_dev  ## Run dev mode server
-	fastapi dev app/main.py
-
 .PHONY: run
 run: install_common  ## Run production server
 	fastapi run app/main.py
+
+.PHONY: run_dev
+run_dev: install_dev  ## Run dev mode server
+	fastapi dev app/main.py
+
+tag ?= latest
+.PHONY: run_docker
+run_docker: ## Run docker distroless server with optional `tag=latest` or `tag=alpine` or `tag=distroless`
+	docker run --rm \
+		--env-file .env \
+		--publish 8000:8000 \
+		--name python_insecure_app \
+		python-insecure-app:$(tag)
 
 .PHONY: test
 test: install_dev check audit quicktest  ## Run tests
@@ -83,22 +104,23 @@ test: install_dev check audit quicktest  ## Run tests
 .PHONY: update
 update: requirements precommit_update ## Run update
 
-.PHONY: vulnerabilityassessment
-vulnerabilityassessment:  ## Run vulnerability assessment
+tag ?= latest
+.PHONY: vuln_assessment
+vuln_assessment:  ## Run vulnerability assessment with optional `tag=latest` or `tag=alpine` or `tag=distroless`
 	docker run --rm \
       --entrypoint="" \
       --env GIT_STRATEGY=none \
       --env TRIVY_CACHE_DIR=/tmp/.trivycache/ \
       --env TRIVY_NO_PROGRESS=true \
       --volume /var/run/docker.sock:/var/run/docker.sock \
-      --volume $$PWD:/tmp/app \
-      --volume $$PWD/.trivy:/tmp/.trivy \
-      --volume $$PWD/.trivy/cache:/tmp/.trivycache \
+      --volume ${PWD}:/tmp/app \
+      --volume ${PWD}/.trivy:/tmp/.trivy \
+      --volume ${PWD}/.trivy/cache:/tmp/.trivycache \
       aquasec/trivy sh -c "trivy clean --scan-cache && trivy image \
 		--exit-code 0 \
 		--format cyclonedx \
 		--output /tmp/.trivy/sbom.json \
-		python-insecure-app && \
+		python-insecure-app:$(tag) && \
 	  trivy config \
 	  	--misconfig-scanners dockerfile \
 		--format template \
@@ -111,12 +133,12 @@ vulnerabilityassessment:  ## Run vulnerability assessment
 		--output /tmp/.trivy/report.html \
 		--scanners vuln \
 		--template @contrib/html.tpl \
-		python-insecure-app && \
+		python-insecure-app:$(tag) && \
 	  trivy image \
 		--exit-code 1 \
 		--ignore-unfixed \
 		--scanners vuln \
-		python-insecure-app"
+		python-insecure-app:$(tag)"
 
 .PHONY: help
 help:

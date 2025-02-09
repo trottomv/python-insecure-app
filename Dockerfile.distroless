@@ -1,0 +1,37 @@
+# syntax=docker/dockerfile:1
+
+ARG VIRTUAL_ENV=/opt/venv
+ARG WORKDIR=/home
+
+FROM python:3.12-slim-bookworm@sha256:31a416db24bd8ade7dac5fd5999ba6c234d7fa79d4add8781e95f41b187f4c9a AS build
+
+LABEL project="Python Insecure App" service="FastAPI" stage="build"
+ARG VIRTUAL_ENV
+ARG WORKDIR
+ENV VIRTUAL_ENV=${VIRTUAL_ENV} \
+    WORKDIR=${WORKDIR}
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+WORKDIR ${WORKDIR}
+COPY requirements/base.txt requirements/base.txt
+COPY requirements/common.txt requirements/common.txt
+RUN python3 -m venv ${VIRTUAL_ENV} \
+    && python3 -m pip install -r requirements/base.txt \
+    && python3 -m uv pip install -r requirements/common.txt
+
+# https://console.cloud.google.com/artifacts/docker/distroless/us/gcr.io/python3-debian12/
+FROM gcr.io/distroless/python3-debian12:nonroot@sha256:b0ae47130fa7633d6599a320610230310ff5126307e3a3a6acf7de3fd6931f94 AS distroless
+
+LABEL project="Python Insecure App" service="FastAPI" stage="distroless"
+ARG VIRTUAL_ENV
+ARG WORKDIR
+ENV INTERNAL_SERVICE_PORT=8000 \
+    VIRTUAL_ENV=${VIRTUAL_ENV} \
+    WORKDIR=${WORKDIR}
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+WORKDIR ${WORKDIR}
+COPY --from=build /usr/local/bin /usr/local/bin
+COPY --from=build /usr/local/lib /usr/local/lib
+COPY --from=build ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY app app
+EXPOSE ${INTERNAL_SERVICE_PORT}
+ENTRYPOINT [ "python3", "-m", "fastapi", "run", "app/main.py" ]
