@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: .
+    environment:
+      - DEBUG
+      - PUBLIC_IP_SERVICE_URL
+      - SUPER_SECRET_NAME
+      - SUPER_SECRET_TOKEN
+    volumes:
+      - ./:/app
+
+  proxy:
+    command:
+      - "--configFile=/traefik/conf/static.yaml"
+    depends_on:
+      app:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 15s
+      timeout: 5s
+      start_period: 5s
+      retries: 5
+    image: traefik:v3.2
+    ports:
+      - "8443:8443"
+      - "8080:8080"
+    volumes:
+      - ./traefik/:/traefik/:ro
