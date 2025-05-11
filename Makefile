@@ -54,10 +54,11 @@ outdated:  ## Check outdated requirements and dependencies
 .PHONY: pentest
 pentest:  ## Run pentest
 	docker run --rm -t \
+		--network host \
 		--volume ${PWD}/.zap/reports:/zap/wrk/reports:rw \
 		ghcr.io/zaproxy/zaproxy:stable \
 		zap-api-scan.py \
-		-t http://host.docker.internal:8000/openapi.json \
+		-t http://localhost:8000/openapi.json \
 		-f openapi \
 		-r reports/$(shell date +%Y%m%d%H%M%S).html \
 		-J reports/$(shell date +%Y%m%d%H%M%S).json
