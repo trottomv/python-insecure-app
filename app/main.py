@@ -18,12 +18,11 @@ async def try_hack_me(name: str = None):
     query = name or config.SUPER_SECRET_NAME
     try:
         # Get the public IP address from an external service
-        public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL)
+        public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL, timeout=3)
         public_ip_response.raise_for_status()
     except requests.HTTPError:
         public_ip = "Unknown"
     else:
         public_ip = public_ip_response.text
-    content = f"<h1>Hello, {query}!<h1><p>Public IP: {public_ip}</p>"
-    # NOTE: https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response
-    return Template(content).render()
+    content = "<h1>Hello, {{query}}!<h1><p>Public IP: {{public_ip}}</p>"
+    return Template(content).render(query=query, public_ip=public_ip)
