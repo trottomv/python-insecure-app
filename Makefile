@@ -56,7 +56,7 @@ pentest:  ## Run pentest
 		--volume ${PWD}/.zap/reports:/zap/wrk/reports:rw \
 		ghcr.io/zaproxy/zaproxy:stable \
 		zap-api-scan.py \
-		-t http://localhost:8000/openapi.json \
+		-t http://localhost:1337/openapi.json \
 		-f openapi \
 		-r reports/$(shell date +%Y%m%d%H%M%S).html \
 		-J reports/$(shell date +%Y%m%d%H%M%S).json
@@ -93,7 +93,7 @@ tag ?= latest
 run_docker: ## Run docker distroless server with optional `tag=latest` or `tag=alpine` or `tag=distroless`
 	docker run --rm \
 		--env-file .env \
-		--publish 8000:8000 \
+		--publish 1337:1337 \
 		--name python_insecure_app \
 		python-insecure-app:$(tag)
 
@@ -117,39 +117,39 @@ venv: ## Create virtual environment
 
 tag ?= latest
 .PHONY: vuln_assessment
-vuln_assessment:  ## Run vulnerability assessment with optional `tag=latest` or `tag=alpine` or `tag=distroless`
+vuln_assessment: ## Run vulnerability assessment
 	docker run --rm \
-      --entrypoint="" \
-      --env GIT_STRATEGY=none \
-      --env TRIVY_CACHE_DIR=/tmp/.trivycache/ \
-      --env TRIVY_NO_PROGRESS=true \
-      --volume /var/run/docker.sock:/var/run/docker.sock \
-      --volume ${PWD}:/tmp/app \
-      --volume ${PWD}/.trivy:/tmp/.trivy \
-      --volume ${PWD}/.trivy/cache:/tmp/.trivycache \
-      aquasec/trivy sh -c "trivy clean --scan-cache && trivy image \
-		--exit-code 0 \
-		--format cyclonedx \
-		--output /tmp/.trivy/sbom.json \
-		python-insecure-app:$(tag) && \
-	  trivy config \
-	  	--misconfig-scanners dockerfile \
-		--format template \
-		--template @contrib/html.tpl \
-		--output /tmp/.trivy/report-config.html \
-		/tmp/app && \
-      trivy image \
-		--exit-code 0 \
-		--format template \
-		--output /tmp/.trivy/report.html \
-		--scanners vuln \
-		--template @contrib/html.tpl \
-		python-insecure-app:$(tag) && \
-	  trivy image \
-		--exit-code 1 \
-		--ignore-unfixed \
-		--scanners vuln \
-		python-insecure-app:$(tag)"
+		--entrypoint="" \
+		--env GIT_STRATEGY=none \
+		--env TRIVY_CACHE_DIR=/tmp/.trivycache/ \
+		--env TRIVY_NO_PROGRESS=true \
+		--volume /var/run/docker.sock:/var/run/docker.sock \
+		--volume ${PWD}:/tmp/app \
+		--volume ${PWD}/.trivy:/tmp/.trivy \
+		--volume ${PWD}/.trivy/cache:/tmp/.trivycache \
+		aquasec/trivy sh -c "trivy clean --scan-cache && trivy image \
+			--exit-code 0 \
+			--format cyclonedx \
+			--output /tmp/.trivy/sbom.json \
+			python-insecure-app:$(tag) && \
+		trivy config \
+			--misconfig-scanners dockerfile \
+			--format template \
+			--template @contrib/html.tpl \
+			--output /tmp/.trivy/report-config.html \
+			/tmp/app && \
+		trivy image \
+			--exit-code 0 \
+			--format template \
+			--output /tmp/.trivy/report.html \
+			--scanners vuln \
+			--template @contrib/html.tpl \
+			python-insecure-app:$(tag) && \
+		trivy image \
+			--exit-code 1 \
+			--ignore-unfixed \
+			--scanners vuln \
+			python-insecure-app:$(tag)"
 
 .PHONY: help
 help:

@@ -1,3 +1,5 @@
+"""The main file for a Python Insecure App."""
+
 import requests
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -15,15 +17,28 @@ app = FastAPI(
 
 @app.get("/", response_class=HTMLResponse)
 async def try_hack_me(name: str = None):
-    query = name or config.SUPER_SECRET_NAME
+    """
+    Root endpoint that greets the user and provides a random text.
+
+    Args:
+        name (str, optional): Name of the user. Defaults to SUPER_SECRET_NAME.
+
+    Returns:
+        str: HTML content with a greeting and a random text.
+    """
+
+    _name = name or config.SUPER_SECRET_NAME
     try:
         # Get the public IP address from an external service
         public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL)
         public_ip_response.raise_for_status()
-    except requests.HTTPError:
+    except (requests.HTTPError, requests.exceptions.InvalidSchema):
         public_ip = "Unknown"
     else:
         public_ip = public_ip_response.text
-    content = f"<h1>Hello, {query}!<h1><p>Public IP: {public_ip}</p>"
-    # NOTE: https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response
+    content = (
+        f"<h1>Hello, {_name}!</h1>"
+        f"<h2>Public IP: <code>{public_ip}</code></h2>"
+    )
+    # FIXME: https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response
     return Template(content).render()

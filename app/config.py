@@ -1,3 +1,5 @@
+"""Configuration settings for the Python Insecure App."""
+
 import os
 
 from dotenv import find_dotenv, load_dotenv
