@@ -118,7 +118,7 @@ make build
 Set the `APP_IMAGE` environment variable in the `.env` file:
 
 ```shell
-APP_IMAGE=python-insecure-app:latest  
+APP_IMAGE=python-insecure-app:latest
 ```
 
 Then, run the application using Docker Compose:

@@ -19,6 +19,7 @@ http:
       headers:
         frameDeny: true
         browserXssFilter: true
+        ContentSecurityPolicy: script-src 'self' 'sha256-QOOQu4W1oxGqd2nbXbxiA1Di6OHQOLQD+o+G9oWL8YY=' https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js; worker-src localhost blob:;
     waf:
       plugin:  # https://traefik.io/blog/traefik-3-deep-dive-into-wasm-support-with-coraza-waf-plugin
         coraza:  # https://coraza.io/

@@ -31,7 +31,7 @@ providers:
   file:
     filename: /traefik/conf/dynamic.yaml
 
-experimental:
+experimental:  # WARNING: Don't try this at home!
   plugins:
     coraza:
       moduleName: "github.com/jcchavezs/coraza-http-wasm-traefik"
