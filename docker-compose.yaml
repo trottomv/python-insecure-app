@@ -1,13 +1,11 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: ./Dockerfile.wolfi
     environment:
       - DEBUG
       - PUBLIC_IP_SERVICE_URL
       - SUPER_SECRET_NAME
       - SUPER_SECRET_TOKEN
+    image: ${APP_IMAGE:-python-insecure-app:latest}
     volumes:
       - ./:/app
 
