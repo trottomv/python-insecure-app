@@ -115,6 +115,10 @@ update: requirements precommit_update ## Run update
 venv: ## Create virtual environment
 	uv venv --python 3.13 .venv --allow-existing
 
+.PHONY: verify_distroless_provenance
+verify_distroless_provenance: ## Verify distroless base image provenance
+	./scripts/verify_distroless_provenance.sh
+
 tag ?= latest
 .PHONY: vuln_assessment
 vuln_assessment: ## Run vulnerability assessment

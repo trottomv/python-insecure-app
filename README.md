@@ -201,6 +201,12 @@ make build_wolfi
 make vuln_assessment tag=wolfi
 ```
 
+### Verify distroless provenance
+
+```shell
+make verify_distroless_provenance
+```
+
 ### Penetration test
 
 ```shell
