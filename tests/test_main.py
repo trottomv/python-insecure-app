@@ -1,3 +1,5 @@
+"""Test cases for the FastAPI application."""
+
 import requests
 from fastapi.testclient import TestClient
 
@@ -15,7 +17,7 @@ def test_root(requests_mock):
     assert response.status_code == 200
     assert (
         response.content.decode()
-        == "<h1>Hello, John Ripper!<h1><p>Public IP: Unknown</p>"
+        == "<h1>Hello, John Ripper!</h1><h2>Public IP: <code>Unknown</code></h2>"
     )
     # Mock the public IP service response
     requests_mock.get(config.PUBLIC_IP_SERVICE_URL, text="123.45.67.89")
@@ -24,11 +26,12 @@ def test_root(requests_mock):
     assert response.status_code == 200
     assert (
         response.content.decode()
-        == "<h1>Hello, John Ripper!<h1><p>Public IP: 123.45.67.89</p>"
+        == "<h1>Hello, John Ripper!</h1><h2>Public IP: <code>123.45.67.89</code></h2>"
     )
     # Test the root endpoint with name parameter
     response = client.get("/?name=Bob")
     assert response.status_code == 200
     assert (
-        response.content.decode() == "<h1>Hello, Bob!<h1><p>Public IP: 123.45.67.89</p>"
+        response.content.decode()
+        == "<h1>Hello, Bob!</h1><h2>Public IP: <code>123.45.67.89</code></h2>"
     )
