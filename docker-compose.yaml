@@ -24,7 +24,7 @@ services:
       timeout: 5s
       start_period: 5s
       retries: 5
-    image: traefik:v3.4.0
+    image: traefik:v3.5.0
     ports:
       - "1337:1337"
       - "8443:8443"
