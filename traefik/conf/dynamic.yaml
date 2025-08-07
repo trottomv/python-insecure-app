@@ -24,7 +24,7 @@ http:
       plugin:  # https://traefik.io/blog/traefik-3-deep-dive-into-wasm-support-with-coraza-waf-plugin
         coraza:  # https://coraza.io/
           directives:
-            - SecRuleEngine Off
+            - SecRuleEngine On
             # - SecRequestBodyAccess On
             # - SecRequestBodyLimitAction ProcessPartial
             - SecDebugLogLevel 9

@@ -35,3 +35,6 @@ def test_root(requests_mock):
         response.content.decode()
         == "<h1>Hello, Bob!</h1><h2>Public IP: <code>123.45.67.89</code></h2>"
     )
+    response = client.get("/?name={{7*6}}")
+    assert response.status_code == 200
+    assert "42" not in response.content.decode()
