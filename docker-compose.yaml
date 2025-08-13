@@ -6,8 +6,6 @@ services:
       - SUPER_SECRET_NAME
       - SUPER_SECRET_TOKEN
     image: ${APP_IMAGE:-python-insecure-app:latest}
-    volumes:
-      - ./:/app
 
   proxy:
     command:
