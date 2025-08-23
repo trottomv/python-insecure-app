@@ -16,7 +16,7 @@ app = FastAPI(
 
 
 @app.get("/", response_class=HTMLResponse)
-async def try_hack_me(name: str = None):
+async def try_hack_me(name: str = config.SUPER_SECRET_NAME):
     """
     Root endpoint that greets the user and provides a random text.
 
@@ -26,8 +26,6 @@ async def try_hack_me(name: str = None):
     Returns:
         str: HTML content with a greeting and a random text.
     """
-
-    _name = name or config.SUPER_SECRET_NAME
     try:
         # Get the public IP address from an external service
         public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL)
@@ -36,6 +34,6 @@ async def try_hack_me(name: str = None):
         public_ip = "Unknown"
     else:
         public_ip = public_ip_response.text
-    content = f"<h1>Hello, {_name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>"
+    content = f"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>"
     # FIXME: https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response
     return Template(content).render()
