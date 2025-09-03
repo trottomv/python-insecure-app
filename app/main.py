@@ -34,6 +34,7 @@ async def try_hack_me(name: str = config.SUPER_SECRET_NAME):
         public_ip = "Unknown"
     else:
         public_ip = public_ip_response.text
+    name = name or config.SUPER_SECRET_NAME
     content = f"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>"
     # FIXME: https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response
     return Template(content).render()

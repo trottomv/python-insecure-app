@@ -8,28 +8,28 @@ services:
     image: ${APP_IMAGE:-python-insecure-app:latest}
 
   proxy:
-    command:
-      - "--configFile=/traefik/conf/static.yaml"
+    build: ./caddy
+    container_name: caddy
     depends_on:
       app:
         condition: service_started
     environment:
       - LETSENCRYPT_EMAIL
-      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL=${LETSENCRYPT_EMAIL}
     healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/health"]
       interval: 15s
       timeout: 5s
       start_period: 5s
       retries: 5
-    image: traefik:v3.5.0
     ports:
-      - "1337:1337"
-      - "8443:8443"
-      # - "8080:8080"
+      - "80:80"
+      - "443:443"
+      - "1337:1337" # app
+    restart: always
     volumes:
-      - ./traefik/:/traefik/:ro
-      - traefik_data:/letsencrypt/
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    command: ["caddy", "run", "--watch", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
 
 volumes:
-  traefik_data:
+  caddy_data:
