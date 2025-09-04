@@ -1,0 +1,39 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.wolfi
+    environment:
+      - DEBUG
+      - PUBLIC_IP_SERVICE_URL
+      - SUPER_SECRET_NAME
+      - SUPER_SECRET_TOKEN
+    volumes:
+      - ./:/app
+
+  proxy:
+    command:
+      - "--configFile=/traefik/conf/static.yaml"
+    depends_on:
+      app:
+        condition: service_started
+    environment:
+      - LETSENCRYPT_EMAIL
+      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL=${LETSENCRYPT_EMAIL}
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 15s
+      timeout: 5s
+      start_period: 5s
+      retries: 5
+    image: traefik:v3.4.0
+    ports:
+      - "1337:1337"
+      - "8443:8443"
+      # - "8080:8080"
+    volumes:
+      - ./traefik/:/traefik/:ro
+      - traefik_data:/letsencrypt/
+
+volumes:
+  traefik_data:
