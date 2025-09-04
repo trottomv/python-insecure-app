@@ -1,9 +1,7 @@
 .DEFAULT_GOAL := help
 
 .PHONY: audit
-audit:  ## Audit dependencies and common security issues
-	python3 -m pip_audit --require-hashes --disable-pip --requirement requirements/common.txt
-	python3 -m bandit --exclude "./.venv,./tests" --quiet --recursive .
+audit: sca sast ## Audit dependencies and common security issues
 
 .PHONY: build
 build:  ## Build docker image
@@ -33,19 +31,19 @@ fix:  ## Fix Python code formatting, linting and sorting imports
 
 .PHONY: fuzzytest
 fuzzytest: install_dev  ## Run fuzzy tests
-	schemathesis run --checks all --experimental=openapi-3.1 http://localhost:8000/openapi.json
+	schemathesis run --checks all http://localhost:1337/openapi.json
 
 .PHONY: install_base
 install_base:  ## Install base requirements and dependencies
-	python3 -m pip install --quiet --upgrade pip~=25.1.0 uv~=0.7.0
+	uv pip install -r requirements/base.txt
 
 .PHONY: install_common
 install_common: requirements install_base  ## Install common requirements and dependencies
-	python3 -m uv pip sync requirements/common.txt
+	uv pip sync requirements/common.txt
 
 .PHONY: install_dev
 install_dev: requirements install_base  ## Install dev requirements and dependencies
-	python3 -m uv pip sync requirements/dev.txt
+	uv pip sync requirements/dev.txt
 
 .PHONY: outdated
 outdated:  ## Check outdated requirements and dependencies
@@ -78,9 +76,9 @@ quicktest: install_dev  ## Run quick tests
 
 .PHONY: requirements
 requirements: install_base  ## Compile requirements
-	python3 -m uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/base.txt requirements/base.in
-	python3 -m uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/common.txt requirements/common.in
-	python3 -m uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/dev.txt requirements/dev.in
+	uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/base.txt requirements/base.in
+	uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/common.txt requirements/common.in
+	uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/dev.txt requirements/dev.in
 
 .PHONY: run
 run: install_common  ## Run production server
@@ -88,7 +86,7 @@ run: install_common  ## Run production server
 
 .PHONY: run_dev
 run_dev: install_dev  ## Run dev mode server
-	fastapi dev app/main.py
+	fastapi dev app/main.py --port 1337
 
 tag ?= latest
 .PHONY: run_docker
@@ -99,11 +97,23 @@ run_docker: ## Run docker distroless server with optional `tag=latest` or `tag=a
 		--name python_insecure_app \
 		python-insecure-app:$(tag)
 
+.PHONY: sast
+sast:  ## Audit common security issues
+	python3 -m bandit --exclude "./.venv,./tests" --quiet --recursive .
+
+.PHONY: sca
+sca:  ## Audit the Software Composition Analysis
+	python3 -m pip_audit --require-hashes --disable-pip --requirement requirements/common.txt
+
 .PHONY: test
 test: install_dev check audit quicktest  ## Run tests
 
 .PHONY: update
 update: requirements precommit_update ## Run update
+
+.PHONY: venv
+venv: ## Create virtual environment
+	uv venv --python 3.13 .venv --allow-existing
 
 tag ?= latest
 .PHONY: vuln_assessment
