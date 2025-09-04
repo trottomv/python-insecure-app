@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.12-alpine@sha256:9c51ecce261773a684c8345b2d4673700055c513b4d54bc0719337d3e4ee552e AS alpine
+FROM python:3.13-alpine@sha256:37b14db89f587f9eaa890e4a442a3fe55db452b69cca1403cc730bd0fbdc8aaf AS alpine
 
 LABEL project="Python Insecure App" service="FastAPI" stage="alpine"
 ENV APPUSER=nonroot \
@@ -18,8 +18,7 @@ RUN addgroup -S $APPUSER \
     && adduser -S $APPUSER -G $APPUSER \
     # && apk update \
     # && apk upgrade \
-    #     libcrypto3 \
-    #     libssl3 \
+    #     sqlite-libs \
     # && rm -rf /var/cache/apk \
     && chown $APPUSER:$APPUSER $WORKDIR \
     && python3 -m venv $VIRTUAL_ENV \
