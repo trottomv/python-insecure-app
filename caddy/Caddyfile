@@ -1,0 +1,43 @@
+{
+    email {$LETSENCRYPT_EMAIL}
+}
+
+(health) {
+    @health path /health
+    respond @health "OK" 200
+}
+
+(waf_rules) {
+    coraza_waf {
+        directives `
+            SecRuleEngine Off
+            SecRequestBodyAccess On
+            SecRequestBodyLimitAction Reject
+            SecDebugLogLevel 9
+            SecRule REQUEST_URI|REQUEST_BODY|ARGS "@rx {{.*}}" "id:1001,phase:2,deny,status:403,log,msg:'Blocked SSTI attempt'"
+            SecRule REQUEST_URI|REQUEST_BODY|ARGS "@rx (?i)(\bOR\b|\bAND\b|\bSELECT\b|\bUNION\b|\bDROP\b).*(=|LIKE)" "id:1002,phase:2,deny,status:403,log,msg:'Blocked SQL Injection attempt'"
+            SecRule REQUEST_URI|REQUEST_BODY|ARGS "@rx (?i)<\s*script.*?>" "id:1003,phase:2,deny,status:403,log,msg:'Blocked XSS Injection'"
+            SecRule REQUEST_URI|REQUEST_BODY|ARGS "@rx (\.\./|\./)" "id:1004,phase:2,deny,status:403,log,msg:'Blocked Directory traversal attempt'"
+        `
+    }
+}
+
+localhost {
+    route {
+        import health
+        import waf_rules
+        handle {
+            reverse_proxy app:1337
+        }
+    }
+}
+
+:1337 {
+    route {
+        import health
+        import waf_rules
+        handle {
+            reverse_proxy app:1337
+        }
+    }
+}
