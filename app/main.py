@@ -36,9 +36,6 @@ async def try_hack_me(name: str = None):
         public_ip = "Unknown"
     else:
         public_ip = public_ip_response.text
-    content = (
-        f"<h1>Hello, {_name}!</h1>"
-        f"<h2>Public IP: <code>{public_ip}</code></h2>"
-    )
+    content = f"<h1>Hello, {_name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>"
     # FIXME: https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response
     return Template(content).render()

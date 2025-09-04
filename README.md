@@ -1,4 +1,4 @@
-# Python Insecure and Vulnerable Demo App
+# Python insecure and vulnerable demo app
 
 This project is a deliberately vulnerable **FastAPI** application created to demonstrate common web vulnerabilities and how to perform **remediation** to mitigate them. The goal is to provide a practical example of **Data-Driven Development**, where **security audits** and **assessments** guide the development process to improve application security.
 
@@ -9,25 +9,25 @@ This project is a deliberately vulnerable **FastAPI** application created to dem
 - Practical demonstration of vulnerabilities and their corresponding **remediation**.
 - Use of **shift-left** security practices, involving developers in security efforts from the early stages of development.
 
-## Demonstrated Vulnerabilities
+## Demonstrated vulnerabilities
 
 This application intentionally includes the following vulnerabilities:
 
-1. **Insecure Dependencies**: Use of libraries with known vulnerabilities.
-2. **Hardcoded Secrets**: Credentials and API keys hardcoded into the code.
+1. **Insecure dependencies**: Use of libraries with known vulnerabilities.
+2. **Hardcoded secrets**: Credentials and API keys hardcoded into the code.
 3. **Server-Side Template Injection (SSTI)**: Execution of malicious code via untrusted input in templates.
 
-## Project Objectives
+## Project objectives
 
 1. **Demonstrate vulnerabilities**: Show how certain configurations or lack of validation can lead to real security risks.
-2. **Security Audits**: Use static and dynamic analysis tools to detect and categorize vulnerabilities.
+2. **Security audits**: Use static and dynamic analysis tools to detect and categorize vulnerabilities.
 3. **Remediation**: Show how to apply countermeasures to mitigate or eliminate vulnerabilities by following security best practices.
-4. **Data-Driven Development**: Demonstrate how security audits can guide the development cycle, integrating fixes based on concrete data.
-5. **Shift Left in Security**: Integrate security in the early stages of the development and application lifecycle (DevSecOps).
+4. **Data-Driven development**: Demonstrate how security audits can guide the development cycle, integrating fixes based on concrete data.
+5. **Shift-Left in security**: Integrate security in the early stages of the development and application lifecycle (DevSecOps).
 
-## Tools Used
+## Tools used
 
-- **FastAPI**: Framework used to build the application.
+- **FastAPI**: Framework used to build the web application.
 
     https://fastapi.tiangolo.com/
 
@@ -43,10 +43,6 @@ This application intentionally includes the following vulnerabilities:
 
     https://aquasecurity.github.io/trivy
 
-- **Pre-commit**: Automates security checks before each commit.
-
-    https://pre-commit.com/
-
 - **Fuzzy Testing**: Fuzzy testing to uncover bugs and vulnerabilities.
 
     https://schemathesis.readthedocs.io/
@@ -55,11 +51,17 @@ This application intentionally includes the following vulnerabilities:
 
     https://www.zaproxy.org/docs/docker/api-scan/
 
+- **Pre-commit**: Automates security checks before each commit.
+
+    https://pre-commit.com/
+
 ## Requirements
 
 - **Python 3.9+**
+- **Astral uv**
 - **make**
 - **Docker**
+- **docker compose**
 
 ## Installation
 
@@ -69,20 +71,33 @@ This application intentionally includes the following vulnerabilities:
 git clone https://github.com/trottomv/python-insecure-app
 ```
 
-2. Create and activate a virtual environment:
+2. Copy the `.env_temp` file to `.env`
 
 ```shell
-python3 -m venv .venv
+cp .env_temp .env
+```
+
+And update the necessary environment variables into `.env` file, such as:
+
+```shell
+SUPER_SECRET_NAME='John Ripper'
+SUPER_SECRET_TOKEN='5u93R53Cr3tT0k3n'
+```
+
+3. Create and activate a virtual environment:
+
+```shell
+make venv
 source .venv/bin/activate
 ```
 
-3. Install the dependencies:
+4. Install the development dependencies:
 
 ```shell
 make install_dev
 ```
 
-## Running the Application
+## Running the application in development mode
 
 To run the FastAPI application locally:
 
@@ -92,8 +107,37 @@ make rundev
 
 The app will be available at http://127.0.0.1:8000
 
+## Run with docker compose (optional)
+
+To build and run the Docker image of the application:
+
+```shell
+make build
+make build_alpine
+make build_distroless
+make build_wolfi
+```
+
+Set the `APP_IMAGE` environment variable in the `.env` file to specify one of the following image name you want to use:
+
+- `python-insecure-app:latest`
+- `python-insecure-app:alpine`
+- `python-insecure-app:distroless`
+- `python-insecure-app:wolfi`
+
+```shell
+APP_IMAGE=python-insecure-app:latest
+```
+
+To run the application using Docker Compose:
+
+```shell
+docker compose up
+```
 
 ## Running Tests
+
+### Unit tests
 
 1. Quick tests with coverage report
 
@@ -101,7 +145,7 @@ The app will be available at http://127.0.0.1:8000
 make quicktest
 ```
 
-## Running Security Tests
+### Static security tests (SCA / SAST)
 
 1. Check dependencies and common security issue
 
@@ -111,7 +155,7 @@ make audit
 
 In this step, `pip-audit` and `bandit` will scan the project for known vulnerabilities in your Python dependencies and perform static code analysis to detect potential security flaws in your code. pip-audit checks for outdated or vulnerable packages, while bandit analyzes the codebase for common security issues such as hardcoded secrets, improper exception handling, and unsafe configurations.
 
-2. Fuzzy tests
+### Fuzzy tests
 
 ```shell
 make rundev
@@ -120,16 +164,44 @@ make fuzzytest
 
 In this step, `schemathesis` will be used to perform fuzzy testing on your API endpoints. Schemathesis generates random, unexpected, and malformed inputs based on the OpenAPI specification of your application. This allows for the discovery of edge cases, bugs, and vulnerabilities that traditional unit tests might miss. By executing these tests, you can uncover issues such as improper input validation, crashes, or unhandled exceptions that could lead to security risks or degraded performance.
 
-3. Vulnerability Assessment
-
-```shell
-make build
-make vulnerabilityassessment
-```
+### Vulnerability Assessment
 
 In this step, a Docker image of the application will be built, and **Trivy** will perform a vulnerability scan on the image. Trivy checks for known vulnerabilities in the base image, OS packages, application dependencies and Dockerfile misconfigurations. It identifies any critical, high, or medium security risks that could be present in your containerized application, such as outdated or insecure libraries, misconfigurations, or weak security settings. The results will help guide remediation efforts to secure the Docker environment and dependencies.
 
-4. Penetration test
+We have four different Dockerfiles:
+- `Dockerfile`: The default Dockerfile that uses python:debian base image.
+- `Dockerfile.alpine`: A Dockerfile that uses python:alpine base image.
+- `Dockerfile.distroless`: A Dockerfile that uses python:distroless base image.
+- `Dockerfile.wolfi`: A Dockerfile that uses python:wolfi base image.
+
+1. Vulnerability Assessment for debian
+
+```shell
+make build
+make vuln_assessment
+```
+
+2. Vulnerability Assessment for alpine
+
+```shell
+make build_alpine
+make vuln_assessment tag=alpine
+```
+
+3. Vulnerability Assessment for distroless
+
+```shell
+make build_distroless
+make vuln_assessment tag=distroless
+```
+4. Vulnerability Assessment for wolfi
+
+```shell
+make build_wolfi
+make vuln_assessment tag=wolfi
+```
+
+### Penetration test
 
 ```shell
 make rundev
@@ -139,7 +211,6 @@ make pentest
 In this step, we use `OWASP ZAP API Scan` to conduct a penetration test on the running application. **OWASP ZAP** (Zed Attack Proxy) is a widely used open-source tool for finding vulnerabilities in web applications. By configuring ZAP to perform automated scanning and manual testing, you can identify security weaknesses such as cross-site scripting (XSS), SQL injection, and security misconfigurations. The results will provide insights into potential vulnerabilities that may need remediation, helping to strengthen the overall security posture of the application.
 
 ## Pre-commit
-
 
 1. Install pre-commit
 
