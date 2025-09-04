@@ -9,4 +9,5 @@ Dockerfile*
 LICENSE
 Makefile
 requirements/*.in
+scripts
 tests
