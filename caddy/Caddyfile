@@ -10,7 +10,7 @@
 (waf_rules) {
     coraza_waf {
         directives `
-            SecRuleEngine Off
+            SecRuleEngine On
             SecRequestBodyAccess On
             SecRequestBodyLimitAction Reject
             SecDebugLogLevel 9
