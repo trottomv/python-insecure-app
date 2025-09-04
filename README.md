@@ -61,7 +61,7 @@ This application intentionally includes the following vulnerabilities:
 - **Astral uv**
 - **make**
 - **Docker**
-- **docker compose**
+- **Docker Compose**
 
 ## Installation
 
@@ -105,31 +105,23 @@ To run the FastAPI application locally:
 make rundev
 ```
 
-The app will be available at http://127.0.0.1:8000
+The app will be available at http://127.0.0.1:1337
 
-## Run with docker compose (optional)
+## Run with Docker Compose (optional)
 
 To build and run the Docker image of the application:
 
 ```shell
 make build
-make build_alpine
-make build_distroless
-make build_wolfi
 ```
 
-Set the `APP_IMAGE` environment variable in the `.env` file to specify one of the following image name you want to use:
-
-- `python-insecure-app:latest`
-- `python-insecure-app:alpine`
-- `python-insecure-app:distroless`
-- `python-insecure-app:wolfi`
+Set the `APP_IMAGE` environment variable in the `.env` file:
 
 ```shell
-APP_IMAGE=python-insecure-app:latest
+APP_IMAGE=python-insecure-app:latest  
 ```
 
-To run the application using Docker Compose:
+Then, run the application using Docker Compose:
 
 ```shell
 docker compose up
