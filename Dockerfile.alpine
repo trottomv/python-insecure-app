@@ -3,7 +3,7 @@
 FROM python:3.13-alpine@sha256:e5fa639e49b85986c4481e28faa2564b45aa8021413f31026c3856e5911618b1 AS alpine
 
 LABEL project="Python Insecure App" service="FastAPI" stage="alpine"
-# RUN python3 -m pip install --upgrade pip~=25.3
+RUN python3 -m pip install --upgrade pip~=25.3
 ENV NONROOT=nonroot \
 	LANG=C.UTF-8 \
 	LC_ALL=C.UTF-8 \
