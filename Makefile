@@ -8,16 +8,18 @@ build:  ## Build docker image
 	docker build --pull --tag python-insecure-app .
 
 .PHONY: build_alpine
-build_alpine:  ## Build docker alpine image
-	docker build --file Dockerfile.alpine --pull --tag python-insecure-app:alpine .
-
-.PHONY: build_wolfi
-build_wolfi:  ## Build docker wolfi image
-	docker build --file Dockerfile.wolfi --pull --target wolfi-distroless --tag python-insecure-app:wolfi .
+build_alpine: alpine  ## Build docker alpine image
 
 .PHONY: build_distroless
-build_distroless:  ## Build docker distroless image
-	docker build --file Dockerfile.distroless --pull --tag python-insecure-app:distroless .
+build_distroless: distroless  ## Build docker distroless image
+
+.PHONY: build_wolfi
+build_wolfi: wolfi  ## Build docker wolfi image
+
+.PHONY: alpine distroless wolfi
+alpine distroless wolfi:  ## Build a specific Docker image flavor (e.g., make build alpine)
+	@echo "Building $@ image..."
+	docker build --file Dockerfile.$@ --pull --tag python-insecure-app:$@ .
 
 .PHONY: check
 check:  ## Check linting and vulnerabilities

@@ -3,7 +3,7 @@
 ARG VIRTUAL_ENV=/opt/venv
 ARG WORKDIR=/home
 
-FROM python:3.13-slim-bookworm@sha256:4c2cf9917bd1cbacc5e9b07320025bdb7cdf2df7b0ceaccb55e9dd7e30987419 AS build
+FROM python:3.13-slim-trixie@sha256:27f90d79cc85e9b7b2560063ef44fa0e9eaae7a7c3f5a9f74563065c5477cc24 AS build
 
 LABEL project="Python Insecure App" service="FastAPI" stage="build"
 ARG VIRTUAL_ENV
@@ -19,7 +19,7 @@ RUN python3 -m venv ${VIRTUAL_ENV} \
 	&& python3 -m uv pip install -r requirements/common.txt
 
 # https://console.cloud.google.com/artifacts/docker/distroless/us/gcr.io/python3-debian12/
-FROM gcr.io/distroless/python3-debian12:nonroot@sha256:f0705bdc0d76976fc0a7a1995a4135eb9a3358d021f960dfe1a80bd3a4eade82 AS distroless
+FROM gcr.io/distroless/python3-debian12:nonroot@sha256:fe1e2e967b1846d3bef73d94039d1287a8aac181d9f19c9b7d216ae9729ca867 AS distroless
 
 LABEL project="Python Insecure App" service="FastAPI" stage="distroless"
 ARG VIRTUAL_ENV
