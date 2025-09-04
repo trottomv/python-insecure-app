@@ -16,6 +16,11 @@ build_distroless: distroless  ## Build docker distroless image
 .PHONY: build_wolfi
 build_wolfi: wolfi  ## Build docker wolfi image
 
+.PHONY: build_wolfi_distroless
+build_wolfi_distroless:  ## Build docker wolfi-distroless image
+	@echo "Building wolfi_distroless image..."
+	docker build --file Dockerfile.wolfi_distroless --tag python-insecure-app:wolfi-distroless .
+
 .PHONY: alpine distroless wolfi
 alpine distroless wolfi:  ## Build a specific Docker image flavor (e.g., make build alpine)
 	@echo "Building $@ image..."

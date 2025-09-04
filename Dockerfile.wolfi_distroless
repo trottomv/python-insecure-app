@@ -1,0 +1,8 @@
+# syntax=docker/dockerfile:1
+
+FROM python-insecure-app:wolfi AS wolfi-distroless
+USER root
+RUN rm /bin/sh
+USER $NONROOT
+ENTRYPOINT [ "" ]
+CMD [ "python3", "-m", "fastapi", "run", "app/main.py", "--port", "1337" ]
