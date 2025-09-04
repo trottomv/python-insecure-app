@@ -4,28 +4,28 @@ FROM python:3.13-alpine@sha256:37b14db89f587f9eaa890e4a442a3fe55db452b69cca1403c
 
 LABEL project="Python Insecure App" service="FastAPI" stage="alpine"
 ENV APPUSER=nonroot \
-    LANG=C.UTF-8 \
-    LC_ALL=C.UTF-8 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    VIRTUAL_ENV=/opt/venv \
-    WORKDIR=/app
+	LANG=C.UTF-8 \
+	LC_ALL=C.UTF-8 \
+	PYTHONDONTWRITEBYTECODE=1 \
+	PYTHONUNBUFFERED=1 \
+	VIRTUAL_ENV=/opt/venv \
+	WORKDIR=/app
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 WORKDIR $WORKDIR
 COPY --chown=$APPUSER ./requirements/base.txt requirements/base.txt
 COPY --chown=$APPUSER ./requirements/common.txt requirements/common.txt
 RUN addgroup -S $APPUSER \
-    && adduser -S $APPUSER -G $APPUSER \
-    # && apk update \
-    # && apk upgrade \
-    #     sqlite-libs \
-    # && rm -rf /var/cache/apk \
-    && chown $APPUSER:$APPUSER $WORKDIR \
-    && python3 -m venv $VIRTUAL_ENV \
-    && chown -R $APPUSER:$APPUSER $VIRTUAL_ENV \
-    && python3 -m pip install --no-cache-dir -r requirements/base.txt \
-    && python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
+	&& adduser -S $APPUSER -G $APPUSER \
+	# && apk update \
+	# && apk upgrade \
+	#     sqlite-libs \
+	# && rm -rf /var/cache/apk \
+	&& chown $APPUSER:$APPUSER $WORKDIR \
+	&& python3 -m venv $VIRTUAL_ENV \
+	&& chown -R $APPUSER:$APPUSER $VIRTUAL_ENV \
+	&& python3 -m pip install --no-cache-dir -r requirements/base.txt \
+	&& python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
 USER $APPUSER
 COPY --chown=$APPUSER app app
 ENTRYPOINT [ "" ]
-CMD [ "python3", "-m", "fastapi", "run", "app/main.py" ]
+CMD [ "python3", "-m", "fastapi", "run", "app/main.py", "--port", "1337" ]

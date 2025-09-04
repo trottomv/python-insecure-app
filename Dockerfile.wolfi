@@ -6,30 +6,30 @@ ARG APPUSER=nonroot
 ARG VIRTUAL_ENV=/opt/venv
 ARG WORKDIR=/app
 ENV APPUSER=${APPUSER} \
-    LANG=C.UTF-8 \
-    LC_ALL=C.UTF-8 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    VIRTUAL_ENV=${VIRTUAL_ENV} \
-    WORKDIR=${WORKDIR} \
-    PATH="${VIRTUAL_ENV}/bin:${PATH}"
+  LANG=C.UTF-8 \
+  LC_ALL=C.UTF-8 \
+  PYTHONDONTWRITEBYTECODE=1 \
+  PYTHONUNBUFFERED=1 \
+  VIRTUAL_ENV=${VIRTUAL_ENV} \
+  WORKDIR=${WORKDIR} \
+  PATH="${VIRTUAL_ENV}/bin:${PATH}"
 WORKDIR $WORKDIR
 COPY --chown=$APPUSER ./requirements/base.txt requirements/base.txt
 COPY --chown=$APPUSER ./requirements/common.txt requirements/common.txt
 RUN apk update\
-    && apk add python-3.12 \
-    && chown $APPUSER:$APPUSER $WORKDIR \
-    && python3 -m venv $VIRTUAL_ENV \
-    && chown -R $APPUSER:$APPUSER $VIRTUAL_ENV \
-    && python3 -m pip install --no-cache-dir -r requirements/base.txt \
-    && python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
+  && apk add python-3.13 \
+  && chown $APPUSER:$APPUSER $WORKDIR \
+  && python3 -m venv $VIRTUAL_ENV \
+  && chown -R $APPUSER:$APPUSER $VIRTUAL_ENV \
+  && python3 -m pip install --no-cache-dir -r requirements/base.txt \
+  && python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
 USER $APPUSER
 COPY --chown=$APPUSER app app
 ENTRYPOINT [ "" ]
-CMD [ "python3", "-m", "fastapi", "run", "app/main.py" ]
+CMD [ "python3", "-m", "fastapi", "run", "app/main.py", "--port", "1337" ]
 
 FROM wolfi-debug AS wolfi-distroless
 USER root
 RUN rm /bin/sh
 USER $APPUSER
-ENTRYPOINT [ "python3", "-m", "fastapi", "run", "app/main.py" ]
+ENTRYPOINT [ "python3", "-m", "fastapi", "run", "app/main.py", "--port", "1337" ]
