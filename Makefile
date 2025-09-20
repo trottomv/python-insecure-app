@@ -4,17 +4,17 @@
 audit: sca sast ## Audit dependencies and common security issues
 
 .PHONY: build
-build:  ## Build docker image
+build: requirements  ## Build docker image
 	docker build --pull --tag python-insecure-app .
 
 .PHONY: build_alpine
-build_alpine: alpine  ## Build docker alpine image
+build_alpine: requirements alpine  ## Build docker alpine image
 
 .PHONY: build_distroless
-build_distroless: distroless  ## Build docker distroless image
+build_distroless: requirements distroless  ## Build docker distroless image
 
 .PHONY: build_wolfi
-build_wolfi: wolfi  ## Build docker wolfi image
+build_wolfi: requirements wolfi  ## Build docker wolfi image
 
 .PHONY: build_wolfi_distroless
 build_wolfi_distroless:  ## Build docker wolfi-distroless image
