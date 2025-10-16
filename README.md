@@ -94,6 +94,7 @@ source .venv/bin/activate
 4. Install the development dependencies:
 
 ```shell
+make requirements
 make install_dev
 ```
 

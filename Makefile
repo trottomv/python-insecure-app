@@ -82,7 +82,7 @@ quicktest: install_dev  ## Run quick tests
 	python3 -m coverage report
 
 .PHONY: requirements
-requirements: install_base  ## Compile requirements
+requirements:  ## Compile requirements
 	uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/base.txt requirements/base.in
 	uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/common.txt requirements/common.in
 	uv pip compile --generate-hashes --no-header --quiet --resolver=backtracking --strip-extras --upgrade --output-file requirements/dev.txt requirements/dev.in
