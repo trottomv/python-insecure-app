@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.13-slim-trixie@sha256:58c30f5bfaa718b5803a53393190b9c68bd517c44c6c94c1b6c8c172bcfad040 AS debian
+FROM python:3.13-slim-trixie@sha256:079601253d5d25ae095110937ea8cfd7403917b53b077870bccd8b026dc7c42f AS debian
 
 LABEL project="Python Insecure App" service="FastAPI" stage="debian"
 ENV NONROOT=nonroot \
