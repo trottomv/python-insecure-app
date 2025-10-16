@@ -16,10 +16,10 @@ COPY --chown=$NONROOT ./requirements/base.txt requirements/base.txt
 COPY --chown=$NONROOT ./requirements/common.txt requirements/common.txt
 RUN addgroup -S $NONROOT \
 	&& adduser -S $NONROOT -G $NONROOT \
-	# && apk update \
-	# && apk upgrade \
-	#     sqlite-libs \
-	# && rm -rf /var/cache/apk \
+	&& apk update \
+	&& apk upgrade \
+	    sqlite-libs \
+	&& rm -rf /var/cache/apk \
 	&& chown $NONROOT:$NONROOT $WORKDIR \
 	&& python3 -m venv $VIRTUAL_ENV \
 	&& chown -R $NONROOT:$NONROOT $VIRTUAL_ENV \
