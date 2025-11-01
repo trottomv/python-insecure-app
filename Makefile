@@ -97,7 +97,7 @@ run_dev: install_dev  ## Run dev mode server
 
 tag ?= latest
 .PHONY: run_docker
-run_docker: ## Run docker distroless server with optional `tag=latest` or `tag=alpine` or `tag=distroless`
+run_docker: ## Run docker server with optional `tag=latest` or `tag=alpine` or `tag=distroless` or `tag=wolfi`or `tag=wolfi-distroless`
 	docker run --rm \
 		--env-file .env \
 		--publish 1337:1337 \
