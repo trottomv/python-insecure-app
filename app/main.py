@@ -14,6 +14,13 @@ app = FastAPI(
     debug=config.DEBUG,
 )
 
+# VibeAudit Test: SQL Injection
+@app.get("/user/{user_id}")
+async def get_user(user_id: str):
+    query = f"SELECT * FROM users WHERE id = '{user_id}'"
+    return {"query_executed": query}
+
+
 
 @app.get("/", response_class=HTMLResponse)
 async def try_hack_me(name: str = config.SUPER_SECRET_NAME):
