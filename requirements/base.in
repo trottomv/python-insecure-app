@@ -1,2 +1,6 @@
 pip~=25.3.0
 uv~=0.9.0
+
+# Vibe check test: Hallucinated dependencies
+requests-stealth-bypass==1.0.0
+langgraph-vibe-core>=0.0.1
