@@ -59,7 +59,7 @@ This application intentionally includes the following vulnerabilities:
 
 - **Python 3.9+**
 - **Astral uv**
-- **make**
+- **just**
 - **Docker**
 - **Docker Compose**
 
@@ -87,15 +87,15 @@ SUPER_SECRET_TOKEN='5u93R53Cr3tT0k3n'
 3. Create and activate a virtual environment:
 
 ```shell
-make venv
+just venv
 source .venv/bin/activate
 ```
 
 4. Install the development dependencies:
 
 ```shell
-make requirements
-make install_dev
+just requirements
+just install_dev
 ```
 
 ## Running the application in development mode
@@ -103,7 +103,7 @@ make install_dev
 To run the FastAPI application locally:
 
 ```shell
-make rundev
+just rundev
 ```
 
 The app will be available at http://127.0.0.1:1337
@@ -113,7 +113,7 @@ The app will be available at http://127.0.0.1:1337
 To build and run the Docker image of the application:
 
 ```shell
-make build
+just build
 ```
 
 Set the `APP_IMAGE` environment variable in the `.env` file:
@@ -135,7 +135,7 @@ docker compose up
 1. Quick tests with coverage report
 
 ```shell
-make quicktest
+just quicktest
 ```
 
 ### Static security tests (SCA / SAST)
@@ -143,7 +143,7 @@ make quicktest
 1. Check dependencies and common security issue
 
 ```shell
-make audit
+just audit
 ```
 
 In this step, `pip-audit` and `bandit` will scan the project for known vulnerabilities in your Python dependencies and perform static code analysis to detect potential security flaws in your code. pip-audit checks for outdated or vulnerable packages, while bandit analyzes the codebase for common security issues such as hardcoded secrets, improper exception handling, and unsafe configurations.
@@ -151,8 +151,8 @@ In this step, `pip-audit` and `bandit` will scan the project for known vulnerabi
 ### Fuzzy tests
 
 ```shell
-make rundev
-make fuzzytest
+just rundev
+just fuzzytest
 ```
 
 In this step, `schemathesis` will be used to perform fuzzy testing on your API endpoints. Schemathesis generates random, unexpected, and malformed inputs based on the OpenAPI specification of your application. This allows for the discovery of edge cases, bugs, and vulnerabilities that traditional unit tests might miss. By executing these tests, you can uncover issues such as improper input validation, crashes, or unhandled exceptions that could lead to security risks or degraded performance.
@@ -170,41 +170,41 @@ We have four different Dockerfiles:
 1. Vulnerability Assessment for debian
 
 ```shell
-make build
-make vuln_assessment
+just build
+just vuln_assessment
 ```
 
 2. Vulnerability Assessment for alpine
 
 ```shell
-make build_alpine
-make vuln_assessment tag=alpine
+just build_alpine
+just vuln_assessment tag=alpine
 ```
 
 3. Vulnerability Assessment for distroless
 
 ```shell
-make build_distroless
-make vuln_assessment tag=distroless
+just build_distroless
+just vuln_assessment tag=distroless
 ```
 4. Vulnerability Assessment for wolfi
 
 ```shell
-make build_wolfi
-make vuln_assessment tag=wolfi
+just build_wolfi
+just vuln_assessment tag=wolfi
 ```
 
 ### Verify distroless provenance
 
 ```shell
-make verify_distroless_provenance
+just verify_distroless_provenance
 ```
 
 ### Penetration test
 
 ```shell
-make rundev
-make pentest
+just rundev
+just pentest
 ```
 
 In this step, we use `OWASP ZAP API Scan` to conduct a penetration test on the running application. **OWASP ZAP** (Zed Attack Proxy) is a widely used open-source tool for finding vulnerabilities in web applications. By configuring ZAP to perform automated scanning and manual testing, you can identify security weaknesses such as cross-site scripting (XSS), SQL injection, and security misconfigurations. The results will provide insights into potential vulnerabilities that may need remediation, helping to strengthen the overall security posture of the application.
@@ -220,11 +220,11 @@ pre-commit install
 2. Run pre-commit
 
 ```shell
-make precommit
+just precommit
 ```
 
 3. Update pre-commit
 
 ```shell
-make precommit_update
+just precommit_update
 ```
