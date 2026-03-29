@@ -191,6 +191,12 @@ vuln_assessment image=image tag=tag:
             /tmp/app && \
         trivy image \
             --exit-code 0 \
+            --format json \
+            --output /tmp/.trivy/report.json \
+            --scanners vuln \
+            {{image}}:{{tag}} && \
+        trivy image \
+            --exit-code 0 \
             --format template \
             --output /tmp/.trivy/report.html \
             --scanners vuln \
