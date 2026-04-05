@@ -178,7 +178,7 @@ vuln_assessment image=image tag=tag:
         --volume $(pwd):/tmp/app \
         --volume $(pwd)/.trivy:/tmp/.trivy \
         --volume $(pwd)/.trivy/cache:/tmp/.trivycache \
-        aquasec/trivy sh -c "trivy clean --scan-cache && trivy image \
+        aquasec/trivy:0.69.3 sh -c "trivy clean --scan-cache && trivy image \
             --exit-code 0 \
             --format cyclonedx \
             --output /tmp/.trivy/sbom.json \

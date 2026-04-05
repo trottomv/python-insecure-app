@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM chainguard/wolfi-base:latest@sha256:ae238a181d95804645919b2671d50ae77477efbfb299544491346e2911125aaf AS wolfi-debug
+FROM chainguard/wolfi-base:latest@sha256:52e71f61c6afd1f8d2625cff4465d8ecee156668ca665f7e9c582d1cc914eb6a AS wolfi-debug
 
 ARG NONROOT=nonroot
 ARG VIRTUAL_ENV=/opt/venv
