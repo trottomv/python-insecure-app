@@ -45,9 +45,9 @@ build_distroless: requirements distroless
 build_wolfi: requirements wolfi
 
 # Build docker wolfi-distroless image
-build_wolfi_distroless:
-    echo "Building wolfi_distroless image..."
-    docker build --file Dockerfile.wolfi_distroless --tag {{image}}:wolfi-distroless .
+build_wolfi_noshell:
+    echo "Building wolfi_noshell image..."
+    docker build --file Dockerfile.wolfi_noshell --tag {{image}}:wolfi-noshell .
 
 # Build alpine image
 alpine:
