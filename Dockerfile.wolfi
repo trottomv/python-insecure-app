@@ -16,7 +16,7 @@ ENV NONROOT=${NONROOT} \
 WORKDIR $WORKDIR
 COPY --chown=$NONROOT ./requirements/base.txt requirements/base.txt
 COPY --chown=$NONROOT ./requirements/common.txt requirements/common.txt
-RUN apk update\
+RUN apk update --no-cache \
   && apk add python-3.13 \
   && chown $NONROOT:$NONROOT $WORKDIR \
   && python3 -m venv $VIRTUAL_ENV \
