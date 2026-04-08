@@ -172,14 +172,17 @@ trivy_version := "0.69.3"
 isolated_trivy_network := "trivy-net"
 
 # Update vulnerability assessment database
-trivy_db_update:
+trivy_update:
     docker run --rm \
+        --entrypoint="" \
         --env TRIVY_CACHE_DIR=/tmp/.trivycache/ \
         --env TRIVY_NO_PROGRESS=true \
+        --env TRIVY_DISABLE_TELEMETRY=true \
         --volume $(pwd)/.trivy/cache:/tmp/.trivycache \
-        --volume $(pwd)/.trivy/cache/db:/root/.cache/trivy/db \
+        --volume $(pwd)/.trivy/cache/db:/tmp/.trivycache/db \
         aquasec/trivy:{{trivy_version}} \
-        image --download-db-only
+        sh -c "trivy image --download-db-only && \
+        trivy config /tmp"
 
 # Run vulnerability assessment
 vuln_assessment image=image tag=tag:
@@ -190,6 +193,7 @@ vuln_assessment image=image tag=tag:
         --env GIT_STRATEGY=none \
         --env TRIVY_CACHE_DIR=/tmp/.trivycache/ \
         --env TRIVY_NO_PROGRESS=true \
+        --env TRIVY_DISABLE_TELEMETRY=true \
         --volume /var/run/docker.sock:/var/run/docker.sock \
         --volume $(pwd):/tmp/app \
         --volume $(pwd)/.trivy:/tmp/.trivy \
