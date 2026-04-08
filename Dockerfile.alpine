@@ -15,8 +15,6 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 WORKDIR $WORKDIR
 COPY --chown=$NONROOT ./requirements/base.txt requirements/base.txt
 COPY --chown=$NONROOT ./requirements/common.txt requirements/common.txt
-# RUN apk update \
-# 	&& apk upgrade zlib
 RUN addgroup -S $NONROOT \
 	&& adduser -S $NONROOT -G $NONROOT \
 	&& chown $NONROOT:$NONROOT $WORKDIR \
@@ -24,6 +22,7 @@ RUN addgroup -S $NONROOT \
 	&& chown -R $NONROOT:$NONROOT $VIRTUAL_ENV \
 	&& python3 -m pip install --no-cache-dir -r requirements/base.txt \
 	&& python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
+# RUN apk upgrade --no-cache zlib
 USER $NONROOT
 COPY --chown=$NONROOT app app
 ENTRYPOINT [ "" ]

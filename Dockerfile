@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.13-slim-trixie@sha256:739e7213785e88c0f702dcdc12c0973afcbd606dbf021a589cab77d6b00b579d AS debian
+FROM python:3.13-slim-trixie@sha256:f1927c75e81efd1e091dbd64b6c0ecaa5630b38635a3d1c04034ac636e1f94c8 AS debian
 
 LABEL project="Python Insecure App" service="FastAPI" stage="debian"
 ENV NONROOT=nonroot \
@@ -20,6 +20,8 @@ RUN useradd --no-create-home $NONROOT \
 	&& chown -R $NONROOT:$NONROOT $VIRTUAL_ENV \
 	&& python3 -m pip install --no-cache-dir -r requirements/base.txt \
 	&& python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
+# RUN apt-get update \
+# 	&& apt-get install --assume-yes --only-upgrade openssl
 USER $NONROOT
 COPY --chown=$NONROOT app app
 ENTRYPOINT [ "" ]
