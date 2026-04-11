@@ -202,3 +202,15 @@ vuln_assessment image=image tag=tag:
         --volume $(pwd)/scripts:/scripts \
         aquasec/trivy:{{trivy_version}} \
             /scripts/trivy_scan.sh {{image}} {{tag}}
+
+# --------------------
+# Penetration testing
+# --------------------
+## Run pentest
+pentest:
+    docker run --rm --tty \
+        --network host \
+        --volume $(pwd)/.zap/reports:/zap/wrk/reports:rw \
+        --volume $(pwd)/scripts/penetration_test.sh:/scripts/penetration_test.sh \
+        ghcr.io/zaproxy/zaproxy:stable \
+            /scripts/penetration_test.sh
