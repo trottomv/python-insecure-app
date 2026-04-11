@@ -1,5 +1,6 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env sh
+
+set -eu
 
 DOCKERFILE="Dockerfile.distroless"
 

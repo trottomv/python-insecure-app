@@ -181,8 +181,8 @@ trivy_update:
         --volume $(pwd)/.trivy/cache:/tmp/.trivycache \
         --volume $(pwd)/.trivy/cache/db:/tmp/.trivycache/db \
         aquasec/trivy:{{trivy_version}} \
-        sh -c "trivy image --download-db-only && \
-        trivy config /tmp"
+            sh -c "trivy image --download-db-only && \
+            trivy config /tmp"
 
 # Run vulnerability assessment
 vuln_assessment image=image tag=tag:
@@ -199,37 +199,6 @@ vuln_assessment image=image tag=tag:
         --volume $(pwd)/.trivy:/tmp/.trivy \
         --volume $(pwd)/.trivy/cache:/tmp/.trivycache \
         --volume $(pwd)/.trivy/cache/db:/root/.cache/trivy/db \
-        aquasec/trivy:{{trivy_version}} sh -c "trivy clean --scan-cache && \
-        trivy image \
-            --skip-db-update \
-            --exit-code 0 \
-            --format cyclonedx \
-            --output /tmp/.trivy/sbom-{{tag}}.json \
-            {{image}}:{{tag}} && \
-        trivy config \
-            --misconfig-scanners dockerfile \
-            --format template \
-            --template @contrib/html.tpl \
-            --output /tmp/.trivy/report-config-{{tag}}.html \
-            /tmp/app && \
-        trivy image \
-            --skip-db-update \
-            --exit-code 0 \
-            --format json \
-            --output /tmp/.trivy/report-{{tag}}.json \
-            --scanners vuln \
-            {{image}}:{{tag}} && \
-        trivy image \
-            --skip-db-update \
-            --exit-code 0 \
-            --format template \
-            --output /tmp/.trivy/report-{{tag}}.html \
-            --scanners vuln \
-            --template @contrib/html.tpl \
-            {{image}}:{{tag}} && \
-        trivy image \
-            --skip-db-update \
-            --exit-code 1 \
-            --ignore-unfixed \
-            --scanners vuln \
-            {{image}}:{{tag}}"
+        --volume $(pwd)/scripts:/scripts \
+        aquasec/trivy:{{trivy_version}} \
+            /scripts/trivy_scan.sh {{image}} {{tag}}
