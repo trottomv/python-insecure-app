@@ -3,7 +3,7 @@
 ARG VIRTUAL_ENV=/opt/venv
 ARG WORKDIR=/home
 
-FROM python:3.13-slim-bookworm AS build
+FROM python:3.13-slim-trixie AS build
 
 LABEL project="Python Insecure App" service="FastAPI" stage="build"
 ARG VIRTUAL_ENV
