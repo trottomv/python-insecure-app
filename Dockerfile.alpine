@@ -22,7 +22,7 @@ RUN addgroup -S $NONROOT \
 	&& chown -R $NONROOT:$NONROOT $VIRTUAL_ENV \
 	&& python3 -m pip install --no-cache-dir -r requirements/base.txt \
 	&& python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
-# RUN apk upgrade --no-cache zlib
+# RUN apk upgrade --no-cache zlib libcrypto3 libssl3 libuuid musl musl-utils
 USER $NONROOT
 COPY --chown=$NONROOT app app
 ENTRYPOINT [ "" ]

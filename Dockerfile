@@ -3,6 +3,7 @@
 FROM python:3.13-slim-trixie@sha256:f1927c75e81efd1e091dbd64b6c0ecaa5630b38635a3d1c04034ac636e1f94c8 AS debian
 
 LABEL project="Python Insecure App" service="FastAPI" stage="debian"
+# RUN python3 -m pip install --upgrade pip~=26.0
 ENV NONROOT=nonroot \
 	LANG=C.UTF-8 \
 	LC_ALL=C.UTF-8 \
