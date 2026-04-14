@@ -6,4 +6,4 @@ pre-commit~=4.5.0
 pytest~=9.0.0
 requests-mock~=1.12.0
 ruff~=0.15.0
-schemathesis~=4.14.0
+schemathesis~=4.15.0
