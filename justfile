@@ -182,7 +182,7 @@ trivy_update:
         --volume $(pwd)/.trivy/cache/db:/tmp/.trivycache/db \
         aquasec/trivy:{{trivy_version}} \
             sh -c "trivy image --download-db-only && \
-            trivy config /tmp"
+            trivy config /dev/null"
 
 # Run vulnerability assessment
 vuln_assessment image=image tag=tag:
