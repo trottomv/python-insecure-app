@@ -168,7 +168,7 @@ verify_distroless_provenance:
 # Vulnerability assessment
 # --------------------
 # Variables for vulnerability assessment
-trivy_version := "0.69.3"
+trivy_version := "0.70.0"
 isolated_trivy_network := "trivy-net"
 
 # Update vulnerability assessment database
