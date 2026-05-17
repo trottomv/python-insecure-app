@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.13-alpine@sha256:bb1f2fdb1065c85468775c9d680dcd344f6442a2d1181ef7916b60a623f11d40 AS alpine
+FROM python:3.13-alpine@sha256:420cd0bf0f3998275875e02ecd5808168cf0843cbb4d3c536432f729247b2acc AS alpine
 
 LABEL project="Python Insecure App" service="FastAPI" stage="alpine"
-# RUN python3 -m pip install --upgrade pip~=26.0
+# RUN python3 -m pip install --upgrade pip~=26.1 \
+# 	&& apk upgrade --no-cache xz-libs
 ENV NONROOT=nonroot \
 	LANG=C.UTF-8 \
 	LC_ALL=C.UTF-8 \
@@ -22,7 +23,6 @@ RUN addgroup -S $NONROOT \
 	&& chown -R $NONROOT:$NONROOT $VIRTUAL_ENV \
 	&& python3 -m pip install --no-cache-dir -r requirements/base.txt \
 	&& python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
-# RUN apk upgrade --no-cache zlib libcrypto3 libssl3 libuuid musl musl-utils
 USER $NONROOT
 COPY --chown=$NONROOT app app
 ENTRYPOINT [ "" ]
