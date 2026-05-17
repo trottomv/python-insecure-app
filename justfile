@@ -12,6 +12,7 @@ help:
 # --------------------
 image := "python-insecure-app"
 tag := "latest"
+timestamp := `date +%Y%m%d%H%M%S`
 
 # --------------------
 # Audit & Security
@@ -211,6 +212,9 @@ pentest:
     docker run --rm --tty \
         --network host \
         --volume $(pwd)/.zap/reports:/zap/wrk/reports:rw \
-        --volume $(pwd)/scripts/penetration_test.sh:/scripts/penetration_test.sh \
         ghcr.io/zaproxy/zaproxy:stable \
-            /scripts/penetration_test.sh
+            zap-api-scan.py \
+                -t http://localhost:1337/openapi.json \
+                -f openapi \
+                -r /zap/wrk/reports/{{timestamp}}.html \
+                -J /zap/wrk/reports/{{timestamp}}.json
