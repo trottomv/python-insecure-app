@@ -5,10 +5,11 @@ services:
       - PUBLIC_IP_SERVICE_URL
       - SUPER_SECRET_NAME
       - SUPER_SECRET_TOKEN
-    image: ${APP_IMAGE:-python-insecure-app:latest}
+    image: ${APP_IMAGE:-python-insecure-app:debian}
 
   proxy:
     build: ./caddy
+    image: python-insecure-app:proxy
     container_name: caddy
     depends_on:
       app:

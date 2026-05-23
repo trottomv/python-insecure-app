@@ -167,6 +167,12 @@ We have four different Dockerfiles:
 - `Dockerfile.distroless`: A Dockerfile that uses python:distroless base image.
 - `Dockerfile.wolfi`: A Dockerfile that uses python:wolfi base image.
 
+0. Update trivy db and policy rules
+
+```shell
+just trivy_update
+```
+
 1. Vulnerability Assessment for debian
 
 ```shell
@@ -178,20 +184,20 @@ just vuln_assessment
 
 ```shell
 just build_alpine
-just vuln_assessment tag=alpine
+just tag=alpine vuln_assessment
 ```
 
 3. Vulnerability Assessment for distroless
 
 ```shell
 just build_distroless
-just vuln_assessment tag=distroless
+just tag=distroless vuln_assessment
 ```
 4. Vulnerability Assessment for wolfi
 
 ```shell
 just build_wolfi
-just vuln_assessment tag=wolfi
+just tag=wolfi vuln_assessment
 ```
 
 ### Verify distroless provenance

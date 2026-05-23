@@ -19,7 +19,7 @@ RUN python3 -m venv ${VIRTUAL_ENV} \
 	&& python3 -m uv pip install -r requirements/common.txt
 
 # https://console.cloud.google.com/artifacts/docker/distroless/us/gcr.io/python3-debian13/
-FROM gcr.io/distroless/python3-debian13:nonroot@sha256:51b1acc177d535f20fa30a175a657079ee7dce6e326541cfd83a474d9928e123 AS distroless
+FROM gcr.io/distroless/python3-debian13:nonroot AS distroless
 
 LABEL project="Python Insecure App" service="FastAPI" stage="distroless"
 ARG VIRTUAL_ENV

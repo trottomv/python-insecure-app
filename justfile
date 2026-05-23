@@ -11,7 +11,7 @@ help:
 # Variables
 # --------------------
 image := "python-insecure-app"
-tag := "latest"
+tag := "debian"
 timestamp := `date +%Y%m%d%H%M%S`
 
 # --------------------
@@ -34,7 +34,7 @@ sast:
 # --------------------
 # Build docker image
 build: requirements
-    docker build --pull --tag {{image}} .
+    docker build --pull --tag {{image}}:{{tag}} .
 
 # Build docker alpine image
 build_alpine: requirements alpine
