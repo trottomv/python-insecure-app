@@ -10,6 +10,8 @@ client = TestClient(app)
 
 config.PUBLIC_IP_SERVICE_URL = "https://example.com/ip"
 
+config.SUPER_SECRET_NAME = "John Ripper"
+
 
 def test_root(requests_mock):
     # Mock the public IP service response to raise an HTTPError exception
