@@ -3,8 +3,8 @@
 FROM python:3.13-alpine@sha256:420cd0bf0f3998275875e02ecd5808168cf0843cbb4d3c536432f729247b2acc AS alpine
 
 LABEL project="Python Insecure App" service="FastAPI" stage="alpine"
-# RUN python3 -m pip install --upgrade pip~=26.1 \
-# 	&& apk upgrade --no-cache xz-libs
+RUN python3 -m pip install --upgrade pip~=26.1 \
+	&& apk upgrade --no-cache xz-libs
 ENV NONROOT=nonroot \
 	LANG=C.UTF-8 \
 	LC_ALL=C.UTF-8 \
