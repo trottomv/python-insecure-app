@@ -1,0 +1,3 @@
+path "app/*" {
+  capabilities = ["read"]
+}

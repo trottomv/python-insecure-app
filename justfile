@@ -90,7 +90,7 @@ fuzzytest: install_dev
 # --------------------
 # Run quick tests
 quicktest: install_dev
-    python3 -m coverage run --omit=./tests/* --m pytest --disable-warnings
+    python3 -m coverage run --omit=./tests/*,./app/secret_manager.py --m pytest --disable-warnings
     python3 -m coverage report
 
 # Run tests

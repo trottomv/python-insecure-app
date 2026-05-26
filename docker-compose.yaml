@@ -1,11 +1,57 @@
 services:
-  app:
+  openbao:
+    image: openbao/openbao:latest
+    container_name: openbao
+    ports:
+      - "8200:8200"
     environment:
-      - DEBUG
-      - PUBLIC_IP_SERVICE_URL
-      - SUPER_SECRET_NAME
-      - SUPER_SECRET_TOKEN
+      - BAO_ADDR
+      - BAO_TOKEN
+    command: server -config=/etc/openbao/config.hcl
+    healthcheck:
+      interval: 2s
+      retries: 10
+      start_period: 5s
+      test: ["CMD", "wget", "--spider", "--quiet", "http://127.0.0.1:8200/v1/sys/seal-status"]
+      timeout: 10s
+    volumes:
+      - ./openbao/config.hcl:/etc/openbao/config.hcl
+      - ./openbao/data:/openbao/data
+
+  openbao-agent:
+    image: openbao/openbao:latest
+    container_name: openbao-agent
+    depends_on:
+      openbao:
+        condition: service_healthy
+    environment:
+      - BAO_ADDR
+      - BAO_ROLE_ID
+      - BAO_SECRET_ID
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+          mkdir -p /run/secrets && \
+          echo "$BAO_ROLE_ID" > /run/secrets/role_id && \
+          echo "$BAO_SECRET_ID" > /run/secrets/secret_id && \
+          chmod 600 /run/secrets/* && \
+          bao agent -config=/etc/openbao/agent.hcl
+    volumes:
+      - ./openbao/agent.hcl:/etc/openbao/agent.hcl
+      - openbao_token:/run/openbao
+
+  app:
     image: ${APP_IMAGE:-python-insecure-app:debian}
+    environment:
+      - BAO_ADDR
+    depends_on:
+      openbao:
+        condition: service_healthy
+      openbao-agent:
+        condition: service_started
+    volumes:
+      - openbao_token:/openbao:ro
 
   proxy:
     build: ./caddy
@@ -17,7 +63,7 @@ services:
     environment:
       - LETSENCRYPT_EMAIL
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost/health"]
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost/health"]
       interval: 15s
       timeout: 5s
       start_period: 5s
@@ -33,4 +79,5 @@ services:
     command: ["caddy", "run", "--watch", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
 
 volumes:
-  caddy_data:
+  caddy_data: {}
+  openbao_token: {}

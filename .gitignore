@@ -173,3 +173,4 @@ requirements/*.txt
 .trivy/
 .zap/
 *.bak
+openbao/data/

@@ -30,7 +30,11 @@ async def try_hack_me(name: str = config.SUPER_SECRET_NAME):
         # Get the public IP address from an external service
         public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL)
         public_ip_response.raise_for_status()
-    except (requests.HTTPError, requests.exceptions.InvalidSchema):
+    except (
+        requests.HTTPError,
+        requests.exceptions.InvalidSchema,
+        requests.exceptions.MissingSchema,
+    ):
         public_ip = "Unknown"
     else:
         public_ip = public_ip_response.text
