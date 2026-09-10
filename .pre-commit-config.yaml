@@ -28,14 +28,14 @@ repos:
       - id: pyupgrade
         args: ["--py313-plus"]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.15.13
+    rev: v0.16.6
     hooks:
       - id: ruff
         args:
           - --fix
       - id: ruff-format
   - repo: https://github.com/trailofbits/pip-audit
-    rev: v2.10.0
+    rev: v2.10.1
     hooks:
       - id: pip-audit
         args:
