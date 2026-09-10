@@ -167,9 +167,11 @@ cython_debug/
 requirements/*.txt
 
 # Local
+*.bak
+openbao/
 .payloads.txt
 .reports/
 .ruff_cache/
+.schemathesis/
 .trivy/
 .zap/
-*.bak
