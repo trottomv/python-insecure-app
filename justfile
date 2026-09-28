@@ -39,6 +39,9 @@ build: requirements
 # Build docker alpine image
 build_alpine: requirements alpine
 
+# Build docker debian_dhi image
+build_debian_dhi: requirements debian_dhi
+
 # Build docker distroless image
 build_distroless: requirements distroless
 
@@ -54,6 +57,11 @@ build_wolfi_noshell:
 alpine:
     echo "Building alpine image..."
     docker build --file Dockerfile.alpine --pull --tag {{image}}:alpine .
+
+# Build debian_dhi image
+debian_dhi:
+    echo "Building alpine image..."
+    docker build --file Dockerfile.debian_dhi --pull --tag {{image}}:debian_dhi .
 
 # Build distroless image
 distroless:
@@ -200,6 +208,7 @@ vuln_assessment image=image tag=tag:
         --volume $(pwd)/.trivy:/tmp/.trivy \
         --volume $(pwd)/.trivy/cache:/tmp/.trivycache \
         --volume $(pwd)/.trivy/cache/db:/root/.cache/trivy/db \
+        --volume $(pwd)/.trivyignore:/tmp/.trivyignore \
         --volume $(pwd)/scripts:/scripts \
         aquasec/trivy:{{trivy_version}} \
             /scripts/trivy_scan.sh {{image}} {{tag}}
