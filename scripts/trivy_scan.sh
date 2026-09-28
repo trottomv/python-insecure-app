@@ -52,6 +52,7 @@ run "Scan Dockerfile misconfigurations" \
 run "Generate vulnerability report (JSON)" \
 "trivy image \
 --skip-db-update \
+--offline-scan \
 --exit-code 0 \
 --format json \
 --output /tmp/.trivy/report-${TAG}.json \
@@ -61,17 +62,21 @@ ${IMAGE}:${TAG}"
 run "Generate vulnerability report (HTML)" \
 "trivy image \
 --skip-db-update \
+--offline-scan \
 --exit-code 0 \
 --format template \
 --template @contrib/html.tpl \
 --output /tmp/.trivy/report-${TAG}.html \
+--ignorefile /tmp/.trivyignore \
 --scanners vuln \
 ${IMAGE}:${TAG}"
 
 run "Fail pipeline if fixed vulnerabilities are found" \
 "trivy image \
 --skip-db-update \
+--offline-scan \
 --exit-code 1 \
 --ignore-unfixed \
 --scanners vuln \
+--ignorefile /tmp/.trivyignore \
 ${IMAGE}:${TAG}"

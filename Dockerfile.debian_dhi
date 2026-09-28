@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.13-slim-trixie@sha256:7c61056e61ac89e852de05f3dc6fa51a6dd2181797bceed46aa725dd7cb2cd3b AS debian
+FROM dhi.io/python:3.13-debian-dev@sha256:d13087cbaf5f8c68c4baac88ea22e4a5f87ac179a9e7004f3484558154b2e344 AS debian_dhi
 
 LABEL project="Python Insecure App" service="FastAPI" stage="debian"
 ENV NONROOT=nonroot \
@@ -14,9 +14,7 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 WORKDIR $WORKDIR
 COPY --chown=$NONROOT ./requirements/base.txt requirements/base.txt
 COPY --chown=$NONROOT ./requirements/common.txt requirements/common.txt
-RUN useradd --no-create-home $NONROOT \
-	&& chown $NONROOT:$NONROOT $WORKDIR \
-	&& python3 -m venv $VIRTUAL_ENV \
+RUN python3 -m venv $VIRTUAL_ENV \
 	&& chown -R $NONROOT:$NONROOT $VIRTUAL_ENV \
 	&& python3 -m pip install --no-cache-dir -r requirements/base.txt \
 	&& python3 -m uv pip install --no-cache --no-deps -r requirements/common.txt
