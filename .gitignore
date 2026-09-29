@@ -168,10 +168,11 @@ requirements/*.txt
 
 # Local
 *.bak
-openbao/
 .payloads.txt
 .reports/
 .ruff_cache/
+.sboms/
 .schemathesis/
 .trivy/
 .zap/
+openbao/

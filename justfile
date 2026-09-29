@@ -177,6 +177,7 @@ verify_distroless_provenance:
 # Vulnerability assessment
 # --------------------
 # Variables for vulnerability assessment
+syft_version := "v1.52.0"
 trivy_version := "0.74.0"
 isolated_trivy_network := "trivy-net"
 
@@ -193,8 +194,17 @@ trivy_update:
             sh -c "trivy image --download-db-only && \
             trivy config /dev/null"
 
+# Generate sbom with syft
+generate_sbom image=image tag=tag:
+    mkdir -p .sboms
+    docker run --rm \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        --volume $(pwd)/.sboms:/tmp/app/.sboms \
+        anchore/syft:{{syft_version}} \
+    {{image}}:{{tag}} -o cyclonedx-json > .sboms/sbom_{{tag}}.json
+
 # Run vulnerability assessment
-vuln_assessment image=image tag=tag:
+vuln_assessment image=image tag=tag: generate_sbom
     docker network create --internal {{isolated_trivy_network}} || true \
     && docker run --rm \
         --network {{isolated_trivy_network}} \
@@ -208,7 +218,6 @@ vuln_assessment image=image tag=tag:
         --volume $(pwd)/.trivy:/tmp/.trivy \
         --volume $(pwd)/.trivy/cache:/tmp/.trivycache \
         --volume $(pwd)/.trivy/cache/db:/root/.cache/trivy/db \
-        --volume $(pwd)/.trivyignore:/tmp/.trivyignore \
         --volume $(pwd)/scripts:/scripts \
         aquasec/trivy:{{trivy_version}} \
             /scripts/trivy_scan.sh {{image}} {{tag}}
