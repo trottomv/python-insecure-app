@@ -33,14 +33,6 @@ section "Run Trivy vulnerability assessment"
 run "Clean scan cache" \
 "trivy clean --scan-cache"
 
-run "Generate SBOM (CycloneDX format)" \
-"trivy image \
---skip-db-update \
---exit-code 0 \
---format cyclonedx \
---output /tmp/.trivy/sbom-${TAG}.json \
-${IMAGE}:${TAG}"
-
 run "Scan Dockerfile misconfigurations" \
 "trivy config \
 --misconfig-scanners dockerfile \
@@ -50,33 +42,34 @@ run "Scan Dockerfile misconfigurations" \
 /tmp/app"
 
 run "Generate vulnerability report (JSON)" \
-"trivy image \
+"trivy sbom \
 --skip-db-update \
 --offline-scan \
 --exit-code 0 \
 --format json \
 --output /tmp/.trivy/report-${TAG}.json \
 --scanners vuln \
-${IMAGE}:${TAG}"
+--ignorefile /tmp/app/.trivyignore \
+/tmp/app/.sboms/sbom_${TAG}.json"
 
 run "Generate vulnerability report (HTML)" \
-"trivy image \
+"trivy sbom \
 --skip-db-update \
 --offline-scan \
 --exit-code 0 \
 --format template \
 --template @contrib/html.tpl \
 --output /tmp/.trivy/report-${TAG}.html \
---ignorefile /tmp/.trivyignore \
 --scanners vuln \
-${IMAGE}:${TAG}"
+--ignorefile /tmp/app/.trivyignore \
+/tmp/app/.sboms/sbom_${TAG}.json"
 
 run "Fail pipeline if fixed vulnerabilities are found" \
-"trivy image \
+"trivy sbom \
 --skip-db-update \
 --offline-scan \
 --exit-code 1 \
 --ignore-unfixed \
 --scanners vuln \
---ignorefile /tmp/.trivyignore \
-${IMAGE}:${TAG}"
+--ignorefile /tmp/app/.trivyignore \
+/tmp/app/.sboms/sbom_${TAG}.json"
