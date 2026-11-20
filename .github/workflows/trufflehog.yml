@@ -1,0 +1,22 @@
+name: DevSecOps - TruffleHog Secret Scan
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  trufflehog:
+    name: Scan Verified Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Indispensable pour analyser tout l'historique des commits
+      - name: TruffleHog OSS Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          # Analyse tout le dépôt (ou uniquement le différentiel sur une PR)
+          extra_args: --only-verified --fail
