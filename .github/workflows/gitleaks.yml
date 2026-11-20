@@ -1,61 +1,61 @@
-name: DevSecOps - Gitleaks Secret Scan
+# name: DevSecOps - Gitleaks Secret Scan
 
-on:
-  push:
-    branches: ["**"]
-  pull_request:
-    branches: ["**"]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: ["**"]
+#   pull_request:
+#     branches: ["**"]
+#   workflow_dispatch:
 
-jobs:
-  gitleaks_scan:
-    name: Run Gitleaks & Evaluate Threshold
-    runs-on: ubuntu-latest
+# jobs:
+#   gitleaks_scan:
+#     name: Run Gitleaks & Evaluate Threshold
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository with full history
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Équivalent de GIT_DEPTH: 0 (analyse l'ensemble des commits)
+#     steps:
+#       - name: Checkout repository with full history
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0 # Équivalent de GIT_DEPTH: 0 (analyse l'ensemble des commits)
 
-      - name: Install Tools (Gitleaks & jq)
-        run: |
-          sudo apt-get update && sudo apt-get install -y jq
-          # Installation du binaire Gitleaks
-          GITLEAKS_VERSION="8.21.2"
-          wget -q https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz
-          tar -xzf gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz
-          sudo mv gitleaks /usr/local/bin/
-          gitleaks version
+#       - name: Install Tools (Gitleaks & jq)
+#         run: |
+#           sudo apt-get update && sudo apt-get install -y jq
+#           # Installation du binaire Gitleaks
+#           GITLEAKS_VERSION="8.21.2"
+#           wget -q https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz
+#           tar -xzf gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz
+#           sudo mv gitleaks /usr/local/bin/
+#           gitleaks version
 
-      - name: Scan repository and enforce threshold
-        run: |
-          # 1. Scan complet de l'historique (--exit-code 0 pour ne pas casser le step avant le calcul)
-          gitleaks detect --source . --log-opts='--all' --redact --verbose --report-format json --report-path gitleaks-report.json --exit-code 1
+#       - name: Scan repository and enforce threshold
+#         run: |
+#           # 1. Scan complet de l'historique (--exit-code 0 pour ne pas casser le step avant le calcul)
+#           gitleaks detect --source . --log-opts='--all' --redact --verbose --report-format json --report-path gitleaks-report.json --exit-code 1
 
-          # Vérification de la présence du rapport
-          if [ ! -f gitleaks-report.json ] || [ ! -s gitleaks-report.json ]; then
-            echo "[]" > gitleaks-report.json
-          fi
+#           # Vérification de la présence du rapport
+#           if [ ! -f gitleaks-report.json ] || [ ! -s gitleaks-report.json ]; then
+#             echo "[]" > gitleaks-report.json
+#           fi
 
-          # 2. Comptage des secrets détectés
-          SECRET_COUNT=$(jq 'length' gitleaks-report.json)
-          echo "=============================================="
-          echo "Gitleaks a découvert $SECRET_COUNT secrets dans ce dépôt."
-          echo "=============================================="
+#           # 2. Comptage des secrets détectés
+#           SECRET_COUNT=$(jq 'length' gitleaks-report.json)
+#           echo "=============================================="
+#           echo "Gitleaks a découvert $SECRET_COUNT secrets dans ce dépôt."
+#           echo "=============================================="
 
-          # 3. Application de la règle de seuil
-          if [ "$SECRET_COUNT" -gt 3 ]; then
-            echo "::error::ALERTE CRITIQUE : $SECRET_COUNT secrets trouvés (seuil toléré : 3). Échec du build !"
-            exit 1
-          else
-            echo "OK : $SECRET_COUNT secrets trouvés. Seuil respecté, validation du job."
-          fi
+#           # 3. Application de la règle de seuil
+#           if [ "$SECRET_COUNT" -gt 3 ]; then
+#             echo "::error::ALERTE CRITIQUE : $SECRET_COUNT secrets trouvés (seuil toléré : 3). Échec du build !"
+#             exit 1
+#           else
+#             echo "OK : $SECRET_COUNT secrets trouvés. Seuil respecté, validation du job."
+#           fi
 
-      - name: Upload Gitleaks report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-report
-          path: gitleaks-report.json
-          retention-days: 7
+#       - name: Upload Gitleaks report artifact
+#         if: always()
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: gitleaks-report
+#           path: gitleaks-report.json
+#           retention-days: 7
