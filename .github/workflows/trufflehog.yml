@@ -20,5 +20,5 @@ jobs:
       - name: TruffleHog OSS Scan
         uses: trufflesecurity/trufflehog@main
         with:
-          # Analyse tout le dépôt (ou uniquement le différentiel sur une PR)
-          extra_args: --only-verified
+          base: "" # Forces a full repo scan
+          extra_args: --results=verified,unverified
