@@ -18,11 +18,11 @@ jobs:
           fetch-depth: 0 # Indispensable pour analyser tout l'historique des commits
 
       - name: Run TruffleHog on entire Git history
-              run: |
-                docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest \
-                  git file:///pwd \
-                  --results=verified,unverified \
-                  --fail
+        run: |
+          docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest \
+            git file:///pwd \
+            --results=verified,unverified \
+            --fail
 
       # - name: TruffleHog OSS Scan
       #   uses: trufflesecurity/trufflehog@main
