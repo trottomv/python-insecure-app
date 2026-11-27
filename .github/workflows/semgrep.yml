@@ -1,0 +1,37 @@
+name: DevSecOps - Semgrep SAST Scan
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  semgrep-sast:
+    name: Semgrep SAST Quality Gate
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep SAST Analysis
+        run: |
+          semgrep scan \
+            --config "p/default" \
+            --config "p/owasp-top-ten" \
+            --sarif \
+            --output semgrep-results.sarif \
+            --error
+
+      - name: Upload SARIF report to GitHub Advanced Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
